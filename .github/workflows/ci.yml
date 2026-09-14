@@ -1,0 +1,114 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout dev branch
+        uses: actions/checkout@v4
+      - uses: arduino/arduino-lint-action@v1
+        with:
+          compliance: specification
+          project-type: library
+          recursive: true
+
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        board:
+          - fqbn: Dasduino_Boards:avr:core
+          - fqbn: Dasduino_Boards:esp32:connectplus
+          - fqbn: Dasduino_Boards:esp8266:connect
+      fail-fast: false
+
+    steps:
+      - name: Checkout dev branch
+        uses: actions/checkout@v4
+
+      - run: echo ${{ matrix.board.fqbn }}
+
+      - name: Compile examples
+        uses: arduino/compile-sketches@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          platforms: |
+
+
+            - source-url: https://github.com/SolderedElectronics/Dasduino-Board-Definitions-for-Arduino-IDE/raw/master/package_Dasduino_Boards_index.json
+              name: "Dasduino_Boards:avr"
+
+            - source-url: https://github.com/SolderedElectronics/Dasduino-Board-Definitions-for-Arduino-IDE/raw/master/package_Dasduino_Boards_index.json
+              name: "Dasduino_Boards:esp32"
+
+            - source-url: https://github.com/SolderedElectronics/Dasduino-Board-Definitions-for-Arduino-IDE/raw/master/package_Dasduino_Boards_index.json
+              name: "Dasduino_Boards:esp8266"
+
+          fqbn: ${{ matrix.board.fqbn }}
+          libraries: |
+            - source-path: ./
+          sketch-paths: |
+            - ./examples/
+
+  format:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DoozyX/clang-format-lint-action@v0.20
+        with:
+          source: "./src"
+          exclude: "./src/libs"
+          extensions: "h,cpp,c,ino"
+          clangFormatVersion: 20
+          inplace: True
+      - uses: EndBug/add-and-commit@v9
+        with:
+          author_name: Clang Robot
+          author_email: robot@example.com
+          message: "Committing clang-format changes"
+
+  push_main:
+    runs-on: ubuntu-latest
+    needs: [lint, build, format]
+
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: .
+
+      - run: git rm -rf .
+
+      - name: Checkout dev branch
+        uses: actions/checkout@v4
+        with:
+          ref: dev
+          path: ./dev
+
+      - run: sudo apt-get install tree
+      - run: tree
+
+      - run: cp -r ./dev/examples ./examples
+      - run: cp -r ./dev/src ./src
+      - run: cp ./dev/LICENSE ./LICENSE
+      - run: cp ./dev/README.md ./README.md
+      - run: cp ./dev/keywords.txt ./keywords.txt
+      - run: cp ./dev/library.properties ./library.properties
+
+      - run: tree
+
+      - uses: EndBug/add-and-commit@v9
+        with:
+          author_name: Main Push Robot
+          author_email: robot@example.com
+          message: "Committing dev changes"
+          branch: main
+          add: "examples src LICENSE README.md keywords.txt library.properties"

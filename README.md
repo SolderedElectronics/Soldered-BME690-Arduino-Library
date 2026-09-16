@@ -1,13 +1,46 @@
-# NAZIV PROIZVODA Arduino library
+# BME690 Temperature, Humidity, Pressure and Gas Sensor Arduino library
 
-[![CI](https://github.com/SolderedElectronics/Soldered-Generic-Arduino-Library/actions/workflows/ci.yml/badge.svg?branch=dev)](https://github.com/SolderedElectronics/Soldered-Generic-Arduino-Library/actions/workflows/ci.yml)
-[![ATtiny Firmware Compile Test](https://github.com/SolderedElectronics/Soldered-Generic-Arduino-Library/actions/workflows/attiny_test.yml/badge.svg?branch=dev)](https://github.com/SolderedElectronics/Soldered-Generic-Arduino-Library/actions/workflows/attiny_test.yml)
+[![CI](https://github.com/SolderedElectronics/Soldered-BME690-Arduino-Library/actions/workflows/ci.yml/badge.svg?branch=dev)](https://github.com/SolderedElectronics/Soldered-BME690-Arduino-Library/actions/workflows/ci.yml)
 
-| ![Product name](https://upload.wikimedia.org/wikipedia/commons/8/8f/Example_image.svg) |
-| :------------------------------------------------------------------------------------: |
-|                      [NAZIV PROIZVODA](https://www.solde.red/SKU)                      |
+| ![BME690 breakout board](https://upload.wikimedia.org/wikipedia/commons/8/8f/Example_image.svg) |
+| :--------------------------------------------------------------------------------------------: |
+|                          [BME690 breakout board](https://www.solde.red/SKU)                     |
 
-OPIS PROIZVODA + LINK NA [Qwiic ecosystem](https://soldered.com/collections/qwiic-ecosystem).
+Breakout board for the Bosch BME690 sensor, which measures temperature, relative humidity, barometric pressure and
+gas resistance (VOC). The board communicates over I2C only and is part of the
+[Qwiic ecosystem](https://soldered.com/collections/qwiic-ecosystem).
+
+
+### Quick start
+
+```cpp
+#include "BME690-SOLDERED.h"
+
+BME690 sensor;
+
+void setup()
+{
+    Serial.begin(115200);
+    sensor.begin();       // Or sensor.begin(BME69X_I2C_ADDR_HIGH) for address 0x77
+    sensor.setTPH();      // Default over-sampling
+    sensor.setHeaterProf(300, 100); // 300 degrees C for 100 ms
+}
+
+void loop()
+{
+    bme69xData data;
+    sensor.setOpMode(BME69X_FORCED_MODE);
+    delayMicroseconds(sensor.getMeasDur());
+    if (sensor.fetchData())
+    {
+        sensor.getData(data);
+        Serial.println(data.temperature);
+    }
+    delay(1000);
+}
+```
+
+Have a look at the sketches in `examples/` for forced, parallel and sequential mode and for the built-in self test.
 
 ### Repository Contents
 
@@ -17,7 +50,7 @@ OPIS PROIZVODA + LINK NA [Qwiic ecosystem](https://soldered.com/collections/qwii
 
 ### Hardware design
 
-You can find hardware design for this board in _NAZIV PROIZVODA_ hardware repository.
+You can find hardware design for this board in _BME690 breakout board_ hardware repository.
 
 ### Documentation
 
@@ -25,7 +58,7 @@ Access Arduino library documentation [here](https://docs.soldered.com/).
 
 ### About Soldered
 
-<img src="https://raw.githubusercontent.com/SolderedElectronics/Soldered-Generic-Arduino-Library/dev/extras/Soldered-logo-color.png" alt="soldered-logo" width="500"/>
+<img src="https://raw.githubusercontent.com/SolderedElectronics/Soldered-BME690-Arduino-Library/dev/extras/Soldered-logo-color.png" alt="soldered-logo" width="500"/>
 
 At Soldered, we design and manufacture a wide selection of electronic products to help you turn your ideas into acts and bring you one step closer to your final project. Our products are intented for makers and crafted in-house by our experienced team in Osijek, Croatia. We believe that sharing is a crucial element for improvement and innovation, and we work hard to stay connected with all our makers regardless of their skill or experience level. Therefore, all our products are open-source. Finally, we always have your back. If you face any problem concerning either your shopping experience or your electronics project, our team will help you deal with it, offering efficient customer service and cost-free technical support anytime. Some of those might be useful for you:
 
@@ -36,7 +69,7 @@ At Soldered, we design and manufacture a wide selection of electronic products t
 ### Original source
 
 ​
-This library is possible thanks to original [arduino-mcp23017](https://github.com/blemasle/arduino-mcp23017) library. Thank you, blemasle.
+This library is possible thanks to the original [BME690 Sensor API](https://github.com/boschsensortec/BME690_SensorAPI) by Bosch Sensortec, which is BSD-3-Clause licensed. Thank you, Bosch Sensortec.
 
 ### Open-source license
 

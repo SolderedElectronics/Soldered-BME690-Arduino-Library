@@ -40,15 +40,9 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           platforms: |
 
-
-            - source-url: https://github.com/SolderedElectronics/Dasduino-Board-Definitions-for-Arduino-IDE/raw/master/package_Dasduino_Boards_index.json
-              name: "Dasduino_Boards:avr"
-
             - source-url: https://github.com/SolderedElectronics/Dasduino-Board-Definitions-for-Arduino-IDE/raw/master/package_Dasduino_Boards_index.json
               name: "Dasduino_Boards:esp32"
 
-            - source-url: https://github.com/SolderedElectronics/Dasduino-Board-Definitions-for-Arduino-IDE/raw/master/package_Dasduino_Boards_index.json
-              name: "Dasduino_Boards:esp8266"
 
           fqbn: ${{ matrix.board.fqbn }}
           libraries: |

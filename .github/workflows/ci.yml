@@ -53,6 +53,7 @@ jobs:
           fqbn: ${{ matrix.board.fqbn }}
           libraries: |
             - source-path: ./
+            - name: ArduinoJson 
           sketch-paths: |
             - ./examples/
 

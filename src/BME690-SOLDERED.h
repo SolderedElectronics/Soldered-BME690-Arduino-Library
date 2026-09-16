@@ -29,7 +29,9 @@ class BME690 : public Bme69x
     /**
      * @brief Class constructor.
      */
-    BME690() : Bme69x() { }
+    BME690() : Bme69x()
+    {
+    }
 
     /**
      * @brief Initializes the sensor on the default Wire bus.
